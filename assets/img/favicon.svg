@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Stillpoint">
+  <rect x="0" y="0" width="32" height="32" rx="8" ry="8" fill="#0E3B31"/>
+  <circle cx="16" cy="16" r="11" fill="none" stroke="#F2F0EA" stroke-width="1.6"/>
+  <circle cx="16" cy="16" r="7" fill="none" stroke="#F2F0EA" stroke-width="1.6"/>
+  <circle cx="16" cy="16" r="2.6" fill="#F2F0EA"/>
+</svg>

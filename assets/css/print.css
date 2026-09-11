@@ -1,0 +1,135 @@
+@charset "UTF-8";
+/* ==========================================================================
+   STILLPOINT - print stylesheet
+   Optimized for printing a sequence or a pose breakdown to carry to the mat.
+   Linked with media="print" so it never affects screen rendering.
+   ========================================================================== */
+
+@page {
+  size: letter portrait;
+  margin: 0.75in 0.7in 0.85in;
+}
+
+html, body {
+  background: #fff !important;
+  color: #000 !important;
+  font-family: Figtree, "Source Sans Pro", Georgia, "Times New Roman", serif;
+  font-size: 11.5pt;
+  line-height: 1.5;
+}
+
+/* Chrome that does not belong on paper */
+.topbar,
+.siteheader,
+.primarynav,
+.navtoggle,
+.cookiebanner,
+.backtotop,
+.sitefoot__grid,
+.sitefoot__legalnav,
+.player__controls,
+.pacer__controls,
+.filterbar,
+.hero__media,
+.hero__credit,
+.adslot,
+.ad-slot,
+[data-ad-slot],
+.print-hide {
+  display: none !important;
+}
+
+.hero {
+  min-height: 0 !important;
+  background: none !important;
+  color: #000 !important;
+  display: block;
+  padding: 0;
+}
+.hero::after { display: none !important; }
+.hero__body { padding: 0 0 10pt !important; color: #000 !important; }
+.hero__body h1, .hero__body .lede { color: #000 !important; }
+.hero__kicker { color: #000 !important; border-top-color: #000 !important; }
+
+.wrap { max-width: none; padding: 0; }
+
+h1, h2, h3, h4 {
+  font-family: "Bricolage Grotesque", Georgia, "Times New Roman", serif;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+h1 { font-size: 22pt; }
+h2 { font-size: 16pt; margin-top: 16pt; }
+h3 { font-size: 13pt; }
+
+p, li, blockquote, figure, tr, .plate, .plate__block, .index-item, .accordion__item {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+img { max-width: 3.2in !important; filter: grayscale(100%) contrast(1.1) !important; }
+figure { max-width: 3.2in; }
+.grain::after { display: none !important; }
+
+/* Sequence order list is the point of printing */
+.player { border-top: 1.5pt solid #000; border-bottom: 1.5pt solid #000; padding: 8pt 0; }
+.player__display, .player__track { display: none !important; }
+.player__list { margin-top: 0; }
+.player__list li { border-top: 0.5pt solid #999; padding: 5pt 0 5pt 30pt; font-size: 10.5pt; }
+.player__list li[aria-current="true"] { background: none !important; }
+
+.plate { border-top: 1.5pt solid #000; border-bottom: 0.5pt solid #999; padding: 8pt 0 12pt; }
+.plate__grid { display: block; }
+.plate__block { border-top: 0.5pt solid #999; padding-top: 6pt; margin-top: 8pt; }
+.plate__block ul, .plate__block ol, .plate__block p { font-size: 10.5pt; }
+
+.pacer { border: 0.5pt solid #999; padding: 6pt; display: block; }
+.pacer__gauge, .pacer__fill { display: none; }
+
+.accordion__panel[hidden] { display: block !important; }
+.accordion__sign { display: none; }
+
+/* Expand link targets so a printed page is still usable */
+a[href^="http"]::after {
+  content: " (" attr(href) ")";
+  font-size: 8.5pt;
+  color: #444;
+  word-break: break-all;
+}
+
+.linkbtn { display: none !important; }
+.prose a { border-bottom: 0; color: #000; text-decoration: underline; }
+
+/* Plate captions keep their border rhythm but drop to plain black ink. */
+.colophon {
+  border-top: 0.5pt solid #000;
+  color: #000;
+  font-size: 8pt;
+  letter-spacing: 0.16em;
+  margin-top: 10pt;
+  padding-top: 4pt;
+}
+.colophon__folio { color: #000; }
+
+.sitefoot {
+  background: none !important;
+  color: #000 !important;
+  margin-top: 16pt;
+  padding: 8pt 0 0;
+  border-top: 1pt solid #000;
+}
+.sitefoot__top { display: none; }
+.sitefoot__legal { margin-top: 0; border-top: 0; font-size: 8.5pt; color: #000; }
+.sitefoot__colophon { color: #000; border-top-color: #000; }
+
+.sitefoot::after {
+  content: "Stillpoint \2014 stillpoint.studio";
+  display: block;
+  margin-top: 6pt;
+  font-size: 8pt;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.print-only { display: block !important; }

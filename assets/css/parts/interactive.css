@@ -1,0 +1,851 @@
+@charset "UTF-8";
+/* ==========================================================================
+   STILLPOINT — interactive components
+   Studio-modern layer: deep pine, bone canvas, apricot accent, rounded
+   geometry, soft shadows, airy spacing. Loaded after main.css, which owns
+   tokens, reset, layout primitives, header/hero/footer, prose, .btn and
+   .linkbtn. This file styles only the interactive components below and
+   never redeclares a token or a `prefers-color-scheme` block.
+
+   Sections:
+     01  Accordion (FAQ)
+     02  Pose breakdown plates
+     03  Sequence player
+     04  Breath pacer
+     05  Forms and validation
+     06  Cookie banner
+     07  Back to top
+     08  Motion system (reveals)
+     09  Reduced motion (final override)
+     10  Print / visually-hidden notes
+   ========================================================================== */
+
+/* ==========================================================================
+   01  ACCORDION
+   FAQ items as rounded surface cards in a loose stack. The JS toggles
+   `aria-expanded` on .accordion__trigger and the `hidden` attribute on
+   .accordion__panel — nothing else.
+   ========================================================================== */
+
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  margin-block: var(--s3) var(--s4);
+}
+
+.accordion__item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-1);
+  transition: border-color var(--base) var(--ease), box-shadow var(--base) var(--ease);
+}
+
+/* Progressive enhancement: lift the open item slightly. Items still work
+   perfectly without :has() support, they simply skip this extra emphasis. */
+.accordion__item:has(> .accordion__trigger[aria-expanded="true"]) {
+  border-color: var(--pine-soft);
+  box-shadow: var(--shadow-2);
+}
+
+.accordion__trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  padding: var(--s3) var(--s4);
+  font-family: var(--face-display);
+  font-size: var(--step-1);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+  min-height: 44px;
+  transition: color var(--fast) var(--ease);
+}
+.accordion__trigger:hover { color: var(--pine); }
+.accordion__trigger:focus-visible {
+  outline: 2px solid var(--apricot-deep);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+/* Circular +/- badge. Rotates 45deg so the plus reads as a close cross. */
+.accordion__sign {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: var(--r-pill);
+  background: var(--pine-tint);
+  color: var(--pine-deep);
+  font-family: var(--face-text);
+  font-size: 1.05rem;
+  line-height: 1;
+  transition: transform var(--base) var(--ease), background var(--base) var(--ease), color var(--base) var(--ease);
+}
+.accordion__trigger[aria-expanded="true"] .accordion__sign {
+  transform: rotate(45deg);
+  background: var(--pine);
+  color: var(--canvas);
+}
+
+.accordion__panel {
+  padding: 0 var(--s4) var(--s4);
+  max-width: 66ch;
+  color: var(--ink-soft);
+  font-size: var(--step-0);
+  line-height: 1.7;
+}
+.accordion__panel[hidden] { display: none; }
+.accordion__panel > :last-child { margin-bottom: 0; }
+.accordion__panel a { color: var(--pine); text-underline-offset: 0.15em; }
+
+/* Soft open/close animation for browsers that support animating the
+   `display` property across a transition. Everywhere else the panel simply
+   snaps open and closed, which is still correct behaviour. */
+@supports (transition-behavior: allow-discrete) {
+  .accordion__panel {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity var(--base) var(--ease), transform var(--base) var(--ease), display var(--base) allow-discrete;
+  }
+  .accordion__panel[hidden] {
+    display: none;
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  @starting-style {
+    .accordion__panel:not([hidden]) {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+}
+
+@media (min-width: 640px) {
+  .accordion__trigger { font-size: var(--step-2); }
+}
+
+/* ==========================================================================
+   02  POSE BREAKDOWN PLATES
+   The site's signature component, rebuilt as a modern spec sheet: a
+   surface card with a pine-tinted head, a mono meta chip row, and a grid
+   of bordered sub-panels.
+   ========================================================================== */
+
+.plate {
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+  margin-block: var(--s5);
+}
+
+.plate__head {
+  background: var(--pine-tint);
+  border-bottom: 1px solid var(--line-soft);
+  padding: var(--s4);
+}
+
+.plate__title {
+  margin: 0;
+  font-family: var(--face-display);
+  font-size: var(--step-3);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--pine-deep);
+}
+
+.plate__sanskrit {
+  display: block;
+  margin-top: 0.4em;
+  font-family: var(--face-mono);
+  font-size: var(--step-0);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--apricot-deep);
+}
+
+.plate__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s2);
+  margin: var(--s3) 0 0;
+}
+.plate__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 0.4rem 0.9rem;
+  font-family: var(--face-mono);
+  font-size: var(--step--2);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.plate__meta span b {
+  color: var(--pine-deep);
+  font-weight: 700;
+}
+
+.plate__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s3);
+  padding: var(--s4);
+}
+
+.plate__block {
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+}
+.plate__block > h3,
+.plate__block > h4 {
+  margin: 0 0 var(--s2);
+  font-family: var(--face-mono);
+  font-size: var(--step--2);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--pine);
+}
+.plate__block ul,
+.plate__block ol {
+  margin: 0;
+  padding-left: 1.2em;
+  font-size: var(--step--1);
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+.plate__block li { margin-bottom: 0.55em; }
+.plate__block li:last-child { margin-bottom: 0; }
+.plate__block li::marker { color: var(--pine-soft); }
+.plate__block p { font-size: var(--step--1); line-height: 1.7; color: var(--ink-soft); margin-bottom: 0.8em; }
+.plate__block p:last-child { margin-bottom: 0; }
+
+.plate__block--wide { grid-column: 1 / -1; }
+
+/* Cautions and contraindications: warmer, with a left accent so it reads
+   as a distinct register from the rest of the sheet. */
+.plate__block--care {
+  background: var(--apricot-soft);
+  border-color: var(--apricot);
+  border-left: 4px solid var(--apricot-deep);
+}
+.plate__block--care > h3,
+.plate__block--care > h4 { color: var(--apricot-deep); }
+.plate__block--care li::marker { color: var(--apricot-deep); }
+
+@media (min-width: 640px) {
+  .plate__head { padding: var(--s4) var(--s5); }
+  .plate__grid { padding: var(--s4) var(--s5) var(--s5); }
+}
+
+@media (min-width: 900px) {
+  .plate__head { padding: var(--s5); }
+  .plate__title { font-size: var(--step-4); }
+  .plate__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s4);
+    padding: var(--s5);
+  }
+  /* Entry steps is always the longest block; letting it span two rows
+     keeps the shorter blocks stacked beside it instead of leaving a gap. */
+  .plate__block--tall { grid-row: span 2; }
+}
+
+@media (min-width: 1200px) {
+  .plate__grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ==========================================================================
+   03  SEQUENCE PLAYER
+   A calm dark media player: pine-deep panel, huge mono clock, apricot
+   progress bar, and a scrollable step list. Selectors match the data-*
+   hooks and the aria-current="true" state the JS writes onto each <li>.
+   ========================================================================== */
+
+.player {
+  background: var(--pine-deep);
+  color: var(--canvas);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-2);
+  padding: var(--s4);
+  margin-block: var(--s5);
+}
+.player h2,
+.player h3 { color: var(--canvas); }
+.player p { color: rgba(255, 255, 255, 0.78); }
+
+/* Halo focus ring on the dark panel instead of the default apricot-deep,
+   which does not carry enough contrast against pine-deep. Covers .linkbtn
+   controls and any other focusable descendant inside the player. */
+.player :focus-visible {
+  outline: 2px solid var(--halo);
+  outline-offset: 3px;
+}
+
+.player__display {
+  display: grid;
+  gap: var(--s3);
+  align-items: center;
+  margin-bottom: var(--s4);
+}
+
+.player__clock {
+  font-family: var(--face-mono);
+  font-size: clamp(3rem, 11vw, 5rem);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--canvas);
+  font-variant-numeric: tabular-nums;
+}
+
+.player__now { margin: 0; }
+.player__now .step-name {
+  display: block;
+  font-family: var(--face-display);
+  font-size: var(--step-2);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--canvas);
+}
+.player__now .step-sanskrit {
+  display: block;
+  margin-top: 0.2em;
+  font-family: var(--face-mono);
+  font-size: var(--step--1);
+  color: var(--apricot);
+}
+.player__now .step-count {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--face-mono);
+  font-size: var(--step--2);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.player__cue {
+  margin: var(--s3) 0 0;
+  max-width: 54ch;
+  font-size: var(--step-0);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.player__track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  margin: var(--s4) 0;
+}
+.player__bar {
+  height: 100%;
+  width: 0%;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, var(--apricot), var(--apricot-deep));
+  transition: width var(--base) linear;
+}
+
+.player__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+  align-items: center;
+  padding-top: var(--s2);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.player__list {
+  list-style: none;
+  margin: var(--s4) 0 0;
+  padding: 0;
+  max-height: 24rem;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--r-md);
+  counter-reset: step;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+.player__list li {
+  counter-increment: step;
+  position: relative;
+  padding: var(--s3) var(--s3) var(--s3) 3.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: var(--step--1);
+  color: rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+  transition: background var(--fast) var(--ease);
+}
+.player__list li:last-child { border-bottom: 0; }
+.player__list li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: var(--s3);
+  top: var(--s3);
+  font-family: var(--face-mono);
+  font-size: var(--step--2);
+  color: rgba(255, 255, 255, 0.5);
+}
+.player__list li:hover { background: rgba(255, 255, 255, 0.06); }
+.player__list li[aria-current="true"] {
+  background: var(--pine);
+  color: var(--canvas);
+}
+.player__list li[aria-current="true"]::before {
+  color: var(--apricot);
+  font-weight: 700;
+}
+.player__list b { font-weight: 600; color: var(--canvas); }
+.player__list i {
+  font-style: normal;
+  font-family: var(--face-mono);
+  font-size: 0.85em;
+  color: var(--apricot);
+}
+.player__list .hold {
+  float: right;
+  font-family: var(--face-mono);
+  font-size: var(--step--2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
+  padding-left: 1rem;
+}
+.player__list .step-note {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+@media (min-width: 640px) {
+  .player__display { grid-template-columns: auto 1fr; gap: var(--s4); }
+}
+
+@media (min-width: 900px) {
+  .player { padding: var(--s5); }
+}
+
+/* ==========================================================================
+   04  BREATH PACER
+   A soft circular gauge. The JS drives .pacer__fill by setting its width
+   as a percentage; clipping that fill inside a circular, overflow-hidden
+   dial turns the same width value into a calm expanding disc.
+   ========================================================================== */
+
+.pacer {
+  background: var(--pine-tint);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-xl);
+  padding: var(--s4);
+  margin-block: var(--s5);
+  display: grid;
+  gap: var(--s4);
+  align-items: center;
+}
+
+.pacer__gauge {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1;
+  margin-inline: auto;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+}
+.pacer__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4%;
+  background: linear-gradient(135deg, var(--apricot), var(--apricot-deep));
+  transition: width var(--slow) var(--ease);
+}
+/* Inner disc turns the fill into a soft ring rather than a solid wedge. */
+.pacer__gauge::after {
+  content: "";
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.pacer__phase {
+  margin: 0;
+  font-family: var(--face-display);
+  font-size: var(--step-3);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--pine-deep);
+}
+.pacer__count {
+  margin: 0.35rem 0 0;
+  font-family: var(--face-mono);
+  font-size: var(--step-0);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+
+.pacer__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+  align-items: center;
+  margin-top: var(--s3);
+}
+.pacer__select { width: auto; min-width: 13rem; }
+
+@media (min-width: 640px) {
+  .pacer {
+    grid-template-columns: 1fr 1.3fr;
+    padding: var(--s5);
+  }
+}
+
+/* ==========================================================================
+   05  FORMS AND VALIDATION
+   Soft surface fields, mono micro-labels, apricot focus glow. Applies to
+   every form on the site, including the pose-library search field, so the
+   whole site shares one field language.
+   ========================================================================== */
+
+form,
+.form { max-width: 640px; }
+
+.form__row { margin-bottom: var(--s3); }
+.form__row--split { display: grid; gap: var(--s3); }
+
+.fieldset { border: 0; margin: 0; padding: 0; }
+.fieldset > legend,
+label {
+  display: block;
+  margin-bottom: var(--s1);
+  font-family: var(--face-mono);
+  font-size: var(--step--2);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  font-family: var(--face-text);
+  font-size: var(--step-0);
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 0.85rem 1rem;
+  min-height: 46px;
+  transition: border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease), background var(--fast) var(--ease);
+}
+textarea { min-height: 9rem; resize: vertical; }
+
+input::placeholder,
+textarea::placeholder { color: var(--ink-muted); opacity: 1; }
+
+input:hover,
+select:hover,
+textarea:hover { border-color: var(--line-strong); }
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--apricot-deep);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--apricot-soft);
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--apricot-deep);
+  outline-offset: 3px;
+}
+
+input:invalid:not(:placeholder-shown),
+[aria-invalid="true"] { border-color: var(--apricot-deep); }
+[aria-invalid="true"]:focus { box-shadow: 0 0 0 4px var(--apricot-soft); }
+
+.hint {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--face-text);
+  font-size: var(--step--1);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-muted);
+}
+
+.error {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--face-text);
+  font-size: var(--step--1);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--apricot-deep);
+}
+.error[hidden] { display: none; }
+
+.checkline {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-bottom: var(--s2);
+}
+.checkline input[type="checkbox"],
+.checkline input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  margin-top: 0.15rem;
+  accent-color: var(--pine);
+  flex: none;
+}
+.checkline label {
+  margin-bottom: 0;
+  font-family: var(--face-text);
+  font-size: var(--step--1);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.form__status {
+  margin-top: var(--s3);
+  padding: var(--s3);
+  background: var(--pine-tint);
+  border-radius: var(--r-md);
+  border-left: 3px solid var(--pine);
+  color: var(--pine-deep);
+  font-weight: 500;
+}
+.form__status[hidden] { display: none; }
+
+.signup-terms {
+  margin-top: var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--line);
+  font-size: var(--step--1);
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+.signup-terms a { color: var(--pine); }
+
+@media (min-width: 640px) {
+  .form__row--split { grid-template-columns: 1fr 1fr; }
+}
+
+/* ==========================================================================
+   06  COOKIE BANNER
+   A floating card above the bottom edge rather than an edge-to-edge strip.
+   Slides in on the data-shown attribute the JS toggles a tick after it
+   clears the `hidden` attribute, and slides out before hidden is restored.
+   ========================================================================== */
+
+.cookiebanner {
+  position: fixed;
+  left: var(--s3);
+  right: var(--s3);
+  bottom: var(--s3);
+  z-index: var(--z-banner);
+  max-width: 46rem;
+  margin-inline: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-3);
+  padding: var(--s4);
+  opacity: 0;
+  transform: translateY(140%);
+  transition: transform var(--slow) var(--ease), opacity var(--slow) var(--ease);
+}
+.cookiebanner[data-shown="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+.cookiebanner[hidden] { display: none; }
+
+.cookiebanner h2 {
+  margin: 0 0 0.4em;
+  font-size: var(--step-1);
+  color: var(--pine-deep);
+}
+.cookiebanner p {
+  margin: 0 0 var(--s3);
+  max-width: 72ch;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+.cookiebanner a { color: var(--pine); }
+
+.cookiebanner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+  align-items: center;
+}
+
+.cookieprefs {
+  margin-top: var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: var(--s2);
+}
+.cookieprefs[hidden] { display: none; }
+
+@media (min-width: 900px) {
+  .cookiebanner { left: auto; right: var(--s4); bottom: var(--s4); }
+}
+
+/* ==========================================================================
+   07  BACK TO TOP
+   Floating round button, pine fill, appears via the data-shown attribute
+   the IntersectionObserver toggles in main.js.
+   ========================================================================== */
+
+.backtotop {
+  position: fixed;
+  right: var(--s3);
+  bottom: var(--s3);
+  z-index: var(--z-sticky);
+  width: 3rem;
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--pine);
+  color: var(--canvas);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow-2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px) scale(0.9);
+  transition: opacity var(--base) var(--ease), visibility var(--base) var(--ease),
+    transform var(--base) var(--ease), background var(--fast) var(--ease);
+}
+.backtotop[data-shown="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+.backtotop:hover { background: var(--pine-deep); transform: scale(1.08); }
+.backtotop:focus-visible {
+  outline: 2px solid var(--apricot-deep);
+  outline-offset: 3px;
+}
+
+@media (min-width: 900px) {
+  .backtotop { right: var(--s4); bottom: var(--s4); }
+}
+
+/* ==========================================================================
+   08  MOTION SYSTEM
+   Reveals enhance an already-visible default; content is never gated on
+   JS. `has-js` on <html> is the only gate, set by main.js before boot.
+   ========================================================================== */
+
+.js-reveal { opacity: 1; }
+
+html.has-js .js-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--slow) var(--ease), transform var(--slow) var(--ease);
+}
+html.has-js .js-reveal.is-in { opacity: 1; transform: none; }
+
+/* Line-by-line reveal for display headings split into .line spans. */
+html.has-js .js-lines .line {
+  display: block;
+  opacity: 0;
+  transform: translateY(0.4em);
+  transition: opacity var(--slow) var(--ease), transform var(--slow) var(--ease);
+}
+html.has-js .js-lines.is-in .line { opacity: 1; transform: none; }
+html.has-js .js-lines.is-in .line:nth-child(2) { transition-delay: 90ms; }
+html.has-js .js-lines.is-in .line:nth-child(3) { transition-delay: 180ms; }
+html.has-js .js-lines.is-in .line:nth-child(4) { transition-delay: 270ms; }
+
+/* ==========================================================================
+   09  REDUCED MOTION
+   A final, thorough override. Every animation and transform introduced
+   above is neutralized and every reveal target is made fully visible.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .accordion__item,
+  .accordion__sign,
+  .accordion__panel,
+  .player__bar,
+  .player__list li,
+  .pacer__fill,
+  .backtotop,
+  .cookiebanner,
+  input,
+  select,
+  textarea,
+  html.has-js .js-reveal,
+  html.has-js .js-lines .line {
+    transition: none !important;
+    transition-delay: 0s !important;
+  }
+
+  .accordion__trigger[aria-expanded="true"] .accordion__sign { transform: none !important; }
+
+  html.has-js .js-reveal,
+  html.has-js .js-lines .line {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .backtotop[data-shown="true"],
+  .backtotop { transform: none !important; }
+
+  .cookiebanner { transform: translateY(0) !important; }
+  .cookiebanner[hidden] { display: none !important; }
+
+  .pacer__gauge::after { transition: none !important; }
+}
+
+/* ==========================================================================
+   10  PRINT / VISUALLY-HIDDEN NOTES
+   .print-hide needs no rule here — print.css owns print behaviour and
+   nothing above changes display in a way that would break it.
+   .visually-hidden is intentionally not redefined: main.css owns it.
+   ========================================================================== */
